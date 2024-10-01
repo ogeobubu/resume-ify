@@ -3,49 +3,48 @@ import session from "express-session";
 import passport from "passport";
 import dotenv from "dotenv";
 import cors from "cors";
-import "./passport-setup.js";
 import bodyParser from "body-parser";
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
+import path from "path";
+import { fileURLToPath } from "url"; // Import this to get the current module's URL
 
-const PORT = process.env.PORT || 3000;
+// Convert import.meta.url to a usable path
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 dotenv.config();
 
+const PORT = process.env.PORT || 3000;
 const app = express();
+
+// Middleware
 app.use(express.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cors({
+  origin: "http://localhost:5173", // Adjust for production
+  credentials: true,
+}));
 
-app.use(express.static(path.join(__dirname, "../dist")));
-
-app.use(
-  cors({
-    origin: "http://localhost:5173",
-    credentials: true,
-  })
-);
-
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: true,
-  })
-);
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: true,
+}));
 
 app.use(passport.initialize());
 app.use(passport.session());
 
+// MongoDB connection
 const mongoURI = process.env.MONGO_URI;
-mongoose
-  .connect(mongoURI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    serverSelectionTimeoutMS: 20000,
-  })
-  .then(() => console.log("MongoDB connected"))
-  .catch((err) => console.error("MongoDB connection error:", err));
+mongoose.connect(mongoURI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  serverSelectionTimeoutMS: 20000,
+})
+.then(() => console.log("MongoDB connected"))
+.catch((err) => console.error("MongoDB connection error:", err));
 
-// Define a User schema
 const userSchema = new mongoose.Schema({
   fullName: { type: String, required: true },
   email: { type: String, required: true, unique: true },
@@ -55,7 +54,11 @@ const userSchema = new mongoose.Schema({
 // Create a User model
 const User = mongoose.model("User", userSchema);
 
-app.get("/api", (req, res) => {
+// Serve static files from the React app
+app.use(express.static(path.join(__dirname, "../dist")));
+
+// Routes
+app.get("/", (req, res) => {
   const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
   res.redirect(frontendUrl);
 });
@@ -66,75 +69,54 @@ app.post("/api/signup", async (req, res) => {
   try {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({
-        message: "User already exists with this email.",
-      });
+      return res.status(400).json({ message: "User already exists with this email." });
     }
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({ fullName, email, password: hashedPassword });
     await newUser.save();
-    res.status(201).json({
-      message: "User signed up successfully!",
-    });
+    res.status(201).json({ message: "User signed up successfully!" });
   } catch (error) {
     console.error("Sign-up error:", error);
-    res.status(500).json({
-      message: "Sign-up failed: " + error.message,
-    });
+    res.status(500).json({ message: "Sign-up failed: " + error.message });
   }
 });
 
 // Sign-in endpoint
 app.post("/api/signin", async (req, res) => {
   const { email, password } = req.body;
-  const userProfile = await User.findOne({ email });
-  console.log(userProfile);
-  if (userProfile) {
-    const decryptPassword = await bcrypt.compare(
-      password,
-      userProfile.password
-    );
-    if (decryptPassword) {
-      return res.status(200).json({
-        message: "User logged in successfully!",
-      });
-    } else {
-      return res.status(400).json({
-        message: "Email/Password is invalid!",
-      });
+  try {
+    const userProfile = await User.findOne({ email });
+    if (!userProfile) {
+      return res.status(400).json({ message: "User does not exist!" });
     }
-  } else if (!userProfile) {
-    return res.status(400).json({
-      message: "User does not exist!",
-    });
-  } else {
-    return res.status(500).json({
-      message: "Server error! Try again later",
-    });
+    const isPasswordValid = await bcrypt.compare(password, userProfile.password);
+    if (isPasswordValid) {
+      return res.status(200).json({ message: "User logged in successfully!" });
+    } else {
+      return res.status(400).json({ message: "Email/Password is invalid!" });
+    }
+  } catch (error) {
+    console.error("Sign-in error:", error);
+    res.status(500).json({ message: "Server error! Try again later." });
   }
 });
 
-//GOOGLE AUTH
-app.get(
-  "/auth/google",
-  passport.authenticate("google", {
-    scope: ["profile", "email"],
-  })
-);
+// Google Authentication
+app.get("/auth/google", passport.authenticate("google", {
+  scope: ["profile", "email"],
+}));
 
-app.get(
-  "/auth/google/callback",
-  passport.authenticate("google", { failureRedirect: "/" }),
-  (req, res) => {
-    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
-    res.redirect(frontendUrl);
-  }
-);
+app.get("/auth/google/callback", passport.authenticate("google", { failureRedirect: "/" }), (req, res) => {
+  const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+  res.redirect(frontendUrl);
+});
 
+// Serve the React app for all other routes
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "../dist", "index.html"));
 });
 
+// Start the server
 app.listen(PORT, () => {
-  console.log("Server is running on http://localhost:3000");
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
