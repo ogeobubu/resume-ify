@@ -1,12 +1,15 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "module": "commonjs",
+    "target": "esnext",
+    "module": "Node16",
+    "moduleResolution": "Node16",
     "jsx": "react",
     "esModuleInterop": true,
     "allowImportingTsExtensions": true,
-    "moduleResolution": "node16",
+    "noEmit": true,
     "strict": false,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "**/*.spec.ts"]
