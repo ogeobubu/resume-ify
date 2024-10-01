@@ -1,0 +1,7 @@
+{
+  "compilerOptions": {
+    "target": "es2020", // Specify the target ECMAScript version
+    "module": "commonjs", // Use CommonJS modules (adjust if needed)
+    "outDir": "dist" // Specify the output directory for compiled JavaScript files
+  }
+}
