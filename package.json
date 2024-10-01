@@ -6,10 +6,11 @@
   "scripts": {
     "dev": "vite",
     "server": "nodemon ts-node --esm server/server.js",
-    "prod": "vite && ts-node --esm server/server.js",
+    "prod": "concurrently \"vite\" \"ts-node --esm server/server.js\"",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "proxy": "http://localhost:3000"
   },
   "dependencies": {
     "@types/express": "^5.0.0",
@@ -17,6 +18,7 @@
     "axios": "^1.7.7",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.3",
+    "concurrently": "^9.0.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
