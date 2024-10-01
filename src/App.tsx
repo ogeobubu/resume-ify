@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { React, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
-import Signup from "./pages/signup";
-import Signin from "./pages/signin";
+import Signup from "./pages/signup.tsx";
+import Signin from "./pages/signin.tsx";
 
 const App: React.FC = () => {
   return (
