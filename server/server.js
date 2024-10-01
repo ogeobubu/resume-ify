@@ -7,7 +7,7 @@ import bodyParser from "body-parser";
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import path from "path";
-import { fileURLToPath } from "url"; // Import this to get the current module's URL
+import { fileURLToPath } from "url";
 
 // Convert import.meta.url to a usable path
 const __filename = fileURLToPath(import.meta.url);
@@ -23,7 +23,7 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL,
+    origin: "*",
     credentials: true,
   })
 );
@@ -63,9 +63,10 @@ const User = mongoose.model("User", userSchema);
 app.use(express.static(path.join(__dirname, "../dist")));
 
 // Routes
-app.get("/", (req, res) => {
-  const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
-  res.redirect(frontendUrl);
+app.get("/api", (req, res) => {
+  res.status(200).json({
+    message: "Hello World",
+  });
 });
 
 // Sign-up endpoint

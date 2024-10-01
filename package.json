@@ -4,13 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "concurrently \"vite\" \"nodemon ts-node --esm server/server.js\"",
     "server": "nodemon ts-node --esm server/server.js",
-    "prod": "concurrently \"vite\" \"nodemon ts-node --esm server/server.js\"",
+    "prod": "concurrently \"yarn build\" \"nodemon ts-node --esm server/server.js\"",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "proxy": "https://resume-ify.onrender.com/"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@types/express": "^5.0.0",
