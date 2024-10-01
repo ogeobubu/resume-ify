@@ -1,8 +1,9 @@
-import { React, useState } from "react";
+import React from "react"
+import { useState } from "react";
 import { Link } from "react-router-dom"
 import { toast } from "react-toastify";
 import axios from "axios";
-import { signin } from "../api"
+import { signin } from "../api.ts"
 
 const SignUp: React.FC = () => {
   const [loading, setLoading] = useState(false);
