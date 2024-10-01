@@ -53,6 +53,11 @@ const userSchema = new mongoose.Schema({
 // Create a User model
 const User = mongoose.model("User", userSchema);
 
+app.get("/api", (req, res) => {
+  const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+  res.redirect(frontendUrl);
+});
+
 // Sign-up endpoint
 app.post("/api/signup", async (req, res) => {
   const { fullName, email, password } = req.body;
@@ -123,11 +128,6 @@ app.get(
     res.redirect(frontendUrl);
   }
 );
-
-app.get("/", (req, res) => {
-  const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
-  res.redirect(frontendUrl);
-});
 
 app.listen(PORT, () => {
   console.log("Server is running on http://localhost:3000");
