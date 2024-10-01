@@ -124,7 +124,7 @@ app.get(
 );
 
 app.get("/", (req, res) => {
-  res.send('<h1>Home Page</h1><a href="/auth/google">Sign in with Google</a>');
+  res.redirect("http://localhost:5173");
 });
 
 app.listen(PORT, () => {
