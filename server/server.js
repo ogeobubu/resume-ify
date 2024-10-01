@@ -81,7 +81,7 @@ app.post("/api/signup", async (req, res) => {
 app.post("/api/signin", async (req, res) => {
   const { email, password } = req.body;
   const userProfile = await User.findOne({ email });
-  console.log(userProfile)
+  console.log(userProfile);
   if (userProfile) {
     const decryptPassword = await bcrypt.compare(
       password,
@@ -96,14 +96,14 @@ app.post("/api/signin", async (req, res) => {
         message: "Email/Password is invalid!",
       });
     }
-  } else if(!userProfile) {
+  } else if (!userProfile) {
     return res.status(400).json({
       message: "User does not exist!",
     });
   } else {
     return res.status(500).json({
-      message: "Server error! Try again later"
-    })
+      message: "Server error! Try again later",
+    });
   }
 });
 
@@ -119,12 +119,14 @@ app.get(
   "/auth/google/callback",
   passport.authenticate("google", { failureRedirect: "/" }),
   (req, res) => {
-    res.redirect("http://localhost:5173");
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+    res.redirect(frontendUrl);
   }
 );
 
 app.get("/", (req, res) => {
-  res.redirect("http://localhost:5173");
+  const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+  res.redirect(frontendUrl);
 });
 
 app.listen(PORT, () => {
