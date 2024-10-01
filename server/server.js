@@ -21,29 +21,34 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cors({
-  origin: "http://localhost:5173", // Adjust for production
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
+  })
+);
 
-app.use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: true,
-}));
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+  })
+);
 
 app.use(passport.initialize());
 app.use(passport.session());
 
 // MongoDB connection
 const mongoURI = process.env.MONGO_URI;
-mongoose.connect(mongoURI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  serverSelectionTimeoutMS: 20000,
-})
-.then(() => console.log("MongoDB connected"))
-.catch((err) => console.error("MongoDB connection error:", err));
+mongoose
+  .connect(mongoURI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    serverSelectionTimeoutMS: 20000,
+  })
+  .then(() => console.log("MongoDB connected"))
+  .catch((err) => console.error("MongoDB connection error:", err));
 
 const userSchema = new mongoose.Schema({
   fullName: { type: String, required: true },
@@ -69,7 +74,9 @@ app.post("/api/signup", async (req, res) => {
   try {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ message: "User already exists with this email." });
+      return res
+        .status(400)
+        .json({ message: "User already exists with this email." });
     }
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({ fullName, email, password: hashedPassword });
@@ -89,7 +96,10 @@ app.post("/api/signin", async (req, res) => {
     if (!userProfile) {
       return res.status(400).json({ message: "User does not exist!" });
     }
-    const isPasswordValid = await bcrypt.compare(password, userProfile.password);
+    const isPasswordValid = await bcrypt.compare(
+      password,
+      userProfile.password
+    );
     if (isPasswordValid) {
       return res.status(200).json({ message: "User logged in successfully!" });
     } else {
@@ -102,14 +112,21 @@ app.post("/api/signin", async (req, res) => {
 });
 
 // Google Authentication
-app.get("/auth/google", passport.authenticate("google", {
-  scope: ["profile", "email"],
-}));
+app.get(
+  "/auth/google",
+  passport.authenticate("google", {
+    scope: ["profile", "email"],
+  })
+);
 
-app.get("/auth/google/callback", passport.authenticate("google", { failureRedirect: "/" }), (req, res) => {
-  const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
-  res.redirect(frontendUrl);
-});
+app.get(
+  "/auth/google/callback",
+  passport.authenticate("google", { failureRedirect: "/" }),
+  (req, res) => {
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+    res.redirect(frontendUrl);
+  }
+);
 
 // Serve the React app for all other routes
 app.get("*", (req, res) => {
