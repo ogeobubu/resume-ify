@@ -15,6 +15,8 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
+app.use(express.static(path.join(__dirname, "../dist")));
+
 app.use(
   cors({
     origin: "http://localhost:5173",
@@ -53,7 +55,7 @@ const userSchema = new mongoose.Schema({
 // Create a User model
 const User = mongoose.model("User", userSchema);
 
-app.get("/api", (req, res) => {
+app.get("/", (req, res) => {
   const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
   res.redirect(frontendUrl);
 });
@@ -128,6 +130,10 @@ app.get(
     res.redirect(frontendUrl);
   }
 );
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../dist", "index.html"));
+});
 
 app.listen(PORT, () => {
   console.log("Server is running on http://localhost:3000");
