@@ -55,7 +55,7 @@ const userSchema = new mongoose.Schema({
 // Create a User model
 const User = mongoose.model("User", userSchema);
 
-app.get("/", (req, res) => {
+app.get("/api", (req, res) => {
   const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
   res.redirect(frontendUrl);
 });
