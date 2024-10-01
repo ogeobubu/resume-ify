@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "server": "nodemon ts-node --esm server/server.js",
+    "prod": "vite && ts-node --esm server/server.js",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
