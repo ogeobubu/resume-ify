@@ -366,6 +366,18 @@
   dependencies:
     levn "^0.4.1"
 
+"@huggingface/inference@^2.8.1":
+  version "2.8.1"
+  resolved "https://registry.yarnpkg.com/@huggingface/inference/-/inference-2.8.1.tgz#e119a7746faf5ce40ebf37ec97afd51286c27ecb"
+  integrity sha512-EfsNtY9OR6JCNaUa5bZu2mrs48iqeTz0Gutwf+fU0Kypx33xFQB4DKMhp8u4Ee6qVbLbNWvTHuWwlppLQl4p4Q==
+  dependencies:
+    "@huggingface/tasks" "^0.12.9"
+
+"@huggingface/tasks@^0.12.9":
+  version "0.12.14"
+  resolved "https://registry.yarnpkg.com/@huggingface/tasks/-/tasks-0.12.14.tgz#7205f61b62582fa797f2aa3b889bf2164bed9b8a"
+  integrity sha512-Q0osp9nEDQOj1hujCzuGmqIK6nbdi+ogyT0UNlTP5B4xWWEtSi5elkvBaSdQeCksa1XiO1bDC8qu+zAZvRDchQ==
+
 "@humanwhocodes/module-importer@^1.0.1":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@humanwhocodes/module-importer/-/module-importer-1.0.1.tgz#af5b2691a22b44be847b0ca81641c5fb6ad0172c"

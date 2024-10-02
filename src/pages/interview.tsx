@@ -19,7 +19,12 @@ const Interview: React.FC = () => {
   const [jobTitle, setJobTitle] = useState<string>("");
   const [jobDescription, setJobDescription] = useState<string>("");
   const [interviewDate, setInterviewDate] = useState<string>("");
-  const [questions, setQuestions] = useState<string>("");
+  const [questions, setQuestions] = useState<string[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
@@ -55,7 +60,8 @@ const Interview: React.FC = () => {
 
     try {
       const response = await interviewPrep(formData);
-      console.log(response.data);
+      setQuestions(response.data.questions);
+      setIsModalOpen(true);
       toast.success("Successful!");
     } catch (error) {
       toast.error(error?.response?.data?.message);
@@ -126,7 +132,7 @@ const Interview: React.FC = () => {
             </div>
           </div>
 
-          <div className="border border-dashed border-grey-100 rounded-lg md:p-8 p-4 my-0 md:my-8">
+          <div className="border border-dashed border-grey-100 rounded-lg md:p-8 p-4 my-0">
             <h1 className="text-xl font-semibold">Interview Prep</h1>
             <p className="subtitle md:p-4 py-3">
               Interview Prep helps you get comprehensive access to possible
@@ -200,7 +206,7 @@ const Interview: React.FC = () => {
 
                 <div
                   {...getRootProps()}
-                  className="border-2 border-dashed border-blue-500 p-16 text-center rounded-lg my-4"
+                  className="border-2 border-dashed border-green-500 p-16 text-center rounded-lg my-4"
                 >
                   <input {...getInputProps()} />
                   <p className="text-gray-700">
@@ -208,7 +214,7 @@ const Interview: React.FC = () => {
                   </p>
                   <p className="text-gray-500">PDF, DOCX (max, 1mb)</p>
                   {uploadedFile && (
-                    <p className="mt-2 text-sm text-blue-600">
+                    <p className="mt-2 text-sm text-green-600">
                       {uploadedFile.name}
                     </p>
                   )}
@@ -243,20 +249,31 @@ const Interview: React.FC = () => {
                   {loading ? "Generating..." : "Generate Prep"}
                 </button>
               </form>
-              {questions && (
-                <div className="mt-4">
-                  <h2 className="text-lg font-bold">Generated Questions</h2>
-                  <ul className="list-disc pl-5">
-                    {questions.split("\n").map((question, index) => (
-                      <li key={index}>{question}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
             </div>
           </div>
         </div>
       </div>
+
+      {isModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-800 bg-opacity-75 ">
+          <div className="bg-white rounded-lg shadow-lg p-4 overflow-y-auto max-h-[80vh] w-full max-w-lg">
+            <h2 className="text-xl font-bold mb-4">Generated Questions</h2>
+            <ul className="pl-5">
+              {questions.map((question, index) => (
+                <li key={index} className="mb-2">
+                  {question}
+                </li>
+              ))}
+            </ul>
+            <button
+              onClick={closeModal}
+              className="mt-4 w-full bg-red-500 text-white font-bold py-2 rounded hover:bg-red-400"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

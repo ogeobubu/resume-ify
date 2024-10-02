@@ -152,7 +152,6 @@ app.post("/api/signin", async (req, res) => {
 //     throw error;
 //   }
 // };
-const HF_API_URL = 'https://api-inference.huggingface.co/models/EleutherAI/gpt-neo-2.7B';
 
 const callHuggingFace = async (prompt) => {
   try {
@@ -164,17 +163,18 @@ const callHuggingFace = async (prompt) => {
       {
         headers: {
           Authorization: `Bearer ${process.env.HF_API_KEY}`,
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
       }
     );
 
-    return response.data[0].generated_text.split("\n");
+    return response.data[0].generated_text.split('\n'); // Adjust this as per the structure of the returned text
   } catch (error) {
-    console.error("Error generating questions:", error);
+    console.error('Error generating questions:', error);
     throw error;
   }
 };
+
 
 // Usage in your route
 app.post("/api/interview-prep", async (req, res) => {
