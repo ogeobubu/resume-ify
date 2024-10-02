@@ -12,32 +12,11 @@ interface SignUpData {
   confirmPassword: string;
 }
 
-const generatePasswordSuggestion = () => {
-  const passwordSuggestion = document.getElementById("passwordSuggestion");
-  const charset =
-    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()";
-  const length = 12;
-  let password = "";
-  for (let i = 0; i < length; i++) {
-    password += charset.charAt(Math.floor(Math.random() * charset.length));
-  }
-  passwordSuggestion.textContent = password;
-};
-
-const showPasswordSuggestion = () => {
-  const passwordSuggestion = document.getElementById("passwordSuggestion");
-  if (passwordSuggestion.style.display === "none") {
-    passwordSuggestion.style.display = "block";
-  } else {
-    passwordSuggestion.style.display = "none";
-  }
-};
-
 const SignUp: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
   const signInWithGoogle = () => {
-    window.location.href = "/api/auth/google";
+    window.location.href = `${import.meta.env.VITE_API_URL}/api/auth/google`;
   };
 
   const handleSubmit = useCallback(
@@ -180,9 +159,7 @@ const SignUp: React.FC = () => {
                   className="mt-1 block w-full border-gray-300 rounded-md border border-[1px] border-solid shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 p-2"
                   required
                   autoComplete="new-password"
-                  onFocus={generatePasswordSuggestion}
                 />
-                <div id="passwordSuggestion" style={{ display: "none" }}></div>
               </div>
               <div className="mt-4">
                 <label

@@ -13,7 +13,7 @@ const SignUp: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
   const signInWithGoogle = () => {
-    window.location.href = "/api/auth/google";
+    window.location.href = `${import.meta.env.VITE_API_URL}/api/auth/google`;
   };
 
   const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {

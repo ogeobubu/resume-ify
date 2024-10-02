@@ -1,3 +1,4 @@
+import './passport-setup.js';
 import express from "express";
 import session from "express-session";
 import passport from "passport";
@@ -8,6 +9,7 @@ import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import path from "path";
 import { fileURLToPath } from "url";
+import { User } from "./models/User.js"
 
 // Convert import.meta.url to a usable path
 const __filename = fileURLToPath(import.meta.url);
@@ -64,15 +66,6 @@ mongoose
   })
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.error("MongoDB connection error:", err));
-
-const userSchema = new mongoose.Schema({
-  fullName: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-});
-
-// Create a User model
-const User = mongoose.model("User", userSchema);
 
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, "../dist")));
