@@ -4,6 +4,7 @@ import { Link } from "react-router-dom"
 import { toast } from "react-toastify";
 import axios from "axios";
 import { signin } from "../api.ts"
+import logo from "../assets/logo.png"
 
 const SignUp: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -36,7 +37,7 @@ const SignUp: React.FC = () => {
       <div className="min-h-screen bg-green-100 flex justify-center p-4">
         <div className="max-w-4xl w-full flex justify-center items-center flex-col">
           <div className="card shadow-sm rounded-lg p-2 bg-white w-full mb-6 text-lg">
-            OhTopUp Resume Review
+          <img className="w-[150px] h-[50px] object-cover" src={logo} alt="logo" />
           </div>
           <div className="flex flex-col md:flex-row justify-between w-full">
             <div className="flex flex-col gap-1">
