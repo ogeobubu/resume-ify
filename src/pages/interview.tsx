@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from "react";
+import { toast } from "react-toastify";
 import { useDropzone } from "react-dropzone";
 import { Link } from "react-router-dom";
 import logo from "../assets/logo.png";
@@ -7,7 +8,7 @@ import { FaLinkedin } from "react-icons/fa";
 import { IoDocumentTextOutline } from "react-icons/io5";
 import { IoIosChatboxes } from "react-icons/io";
 import { getDocument, GlobalWorkerOptions } from "pdfjs-dist/build/pdf";
-import { interviewPrep } from "../api.ts"
+import { interviewPrep } from "../api.ts";
 
 GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.min.js`;
 
@@ -53,10 +54,12 @@ const Interview: React.FC = () => {
     };
 
     try {
-      const response = await interviewPrep(formData)
-      console.log(response.data)
+      const response = await interviewPrep(formData);
+      console.log(response.data);
+      toast.success("Successful!");
     } catch (error) {
-      console.error('Error fetching questions:', error);
+      toast.error(error?.response?.data?.message);
+      console.error("Error fetching questions:", error);
     } finally {
       setLoading(false);
     }
