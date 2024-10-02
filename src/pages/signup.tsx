@@ -8,7 +8,7 @@ import logo from "../assets/logo.png"
 const SignUp: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const signInWithGoogle = () => {
-    window.location.href = "http://localhost:3000/auth/google";
+    window.location.href = `/api/auth/google`;
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -32,7 +32,7 @@ const SignUp: React.FC = () => {
 
     try {
       setLoading(true);
-      const response = await axios.post("http://localhost:3000/api/signup", {
+      const response = await axios.post("/api/signup", {
         fullName,
         email,
         password,

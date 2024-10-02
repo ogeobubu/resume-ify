@@ -28,16 +28,31 @@ app.use(
   })
 );
 
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: true,
-  })
-);
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: true,
+}));
 
 app.use(passport.initialize());
 app.use(passport.session());
+
+// Google Authentication
+app.get(
+  "/api/auth/google",
+  passport.authenticate("google", {
+    scope: ["profile", "email"],
+  })
+);
+
+app.get(
+  "/api/auth/google/callback",
+  passport.authenticate("google", { failureRedirect: "/" }),
+  (req, res) => {
+    const frontendUrl = process.env.FRONTEND_URL;
+    res.redirect(frontendUrl);
+  }
+);
 
 // MongoDB connection
 const mongoURI = process.env.MONGO_URI;
@@ -112,24 +127,6 @@ app.post("/api/signin", async (req, res) => {
   }
 });
 
-// Google Authentication
-app.get(
-  "/auth/google",
-  passport.authenticate("google", {
-    scope: ["profile", "email"],
-  })
-);
-
-app.get(
-  "/auth/google/callback",
-  passport.authenticate("google", { failureRedirect: "/" }),
-  (req, res) => {
-    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
-    res.redirect(frontendUrl);
-  }
-);
-
-// Serve the React app for all other routes
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "../dist", "index.html"));
 });
