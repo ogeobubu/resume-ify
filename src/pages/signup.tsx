@@ -4,6 +4,10 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import { signup } from "../api.ts";
 import logo from "../assets/logo.png";
+import { FiUsers } from "react-icons/fi";
+import { FaLinkedin } from "react-icons/fa";
+import { IoDocumentTextOutline } from "react-icons/io5";
+import { IoIosChatboxes } from "react-icons/io";
 
 interface SignUpData {
   fullName: string;
@@ -78,17 +82,31 @@ const SignUp: React.FC = () => {
               Your Best Friend
             </p>
             <div className="mt-6 bg-white rounded-lg shadow-md text-[14px]">
-              <h2 className="text-xl font-bold border-b-2 border-gray-200 pb-2 mb-4">
-                <span className="px-4 py-2 text-[14px]">Our Services</span>
+              <h2 className="text-xl font-bold border-b-2 border-gray-200 py-2 mb-4">
+                <span className="px-4 py-2 text-[14px] font-semibold">
+                  Our Services
+                </span>
               </h2>
               <h3 className="px-4 text-[14px] font-semibold">
                 Some of our services you'll need:
               </h3>
-              <ul className="list-disc pl-5 mt-2 px-4 flex flex-col gap-1 pb-3">
-                <p>Interviews Prep</p>
-                <p>LinkedIn Profile Review</p>
-                <p>CV/Resume Builder</p>
-                <p>Career Advisor Chat</p>
+              <ul className="list-disc pl-8 mt-2 px-4 flex flex-col gap-2 pb-3">
+                <div className="flex gap-3 items-center">
+                  <FiUsers size={20} />
+                  <span>Interviews Prep</span>
+                </div>
+                <div className="flex gap-3 items-center">
+                  <FaLinkedin size={20} />
+                  <span>LinkedIn Profile Review</span>
+                </div>
+                <div className="flex gap-3 items-center">
+                  <IoDocumentTextOutline size={20} />
+                  <span>CV/Resume Builder</span>
+                </div>
+                <div className="flex gap-3 items-center">
+                  <IoIosChatboxes size={20} />
+                  <span>Career Advisor Chat</span>
+                </div>
               </ul>
             </div>
           </div>

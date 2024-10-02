@@ -14,3 +14,8 @@ export const signup = async (data) => {
     const response = await axiosInstance.post(`/api/signup`, data);
     return response;
 };
+
+export const interviewPrep = async (data) => {
+  const response = await axiosInstance.post(`/api/interview-prep`, data);
+    return response;
+}

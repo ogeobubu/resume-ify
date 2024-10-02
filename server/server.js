@@ -1,4 +1,4 @@
-import './passport-setup.js';
+import "./passport-setup.js";
 import express from "express";
 import session from "express-session";
 import passport from "passport";
@@ -9,9 +9,10 @@ import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import path from "path";
 import { fileURLToPath } from "url";
-import { User } from "./models/User.js"
+import { User } from "./models/User.js";
+import Interview from "./models/Interview.js";
+import axios from "axios";
 
-// Convert import.meta.url to a usable path
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -20,7 +21,6 @@ dotenv.config();
 const PORT = process.env.PORT || 3000;
 const app = express();
 
-// Middleware
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(
@@ -30,16 +30,17 @@ app.use(
   })
 );
 
-app.use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: true,
-}));
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+  })
+);
 
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Google Authentication
 app.get(
   "/api/auth/google",
   passport.authenticate("google", {
@@ -117,6 +118,89 @@ app.post("/api/signin", async (req, res) => {
   } catch (error) {
     console.error("Sign-in error:", error);
     res.status(500).json({ message: "Server error! Try again later." });
+  }
+});
+
+const MAX_RETRIES = 5;
+
+const callOpenAIWithBackoff = async (prompt, retries = 0) => {
+  try {
+    const response = await axios.post(
+      "https://api.openai.com/v1/chat/completions",
+      {
+        model: "gpt-3.5-turbo",
+        messages: [{ role: "user", content: prompt }],
+        max_tokens: 100,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    return response.data.choices[0].message.content.trim().split("\n");
+  } catch (error) {
+    if (
+      error.response &&
+      error.response.status === 429 &&
+      retries < MAX_RETRIES
+    ) {
+      const waitTime = Math.pow(2, retries) * 2000;
+      console.log(`Rate limit hit. Retrying in ${waitTime / 1000} seconds...`);
+      await new Promise((resolve) => setTimeout(resolve, waitTime));
+      return callOpenAIWithBackoff(prompt, retries + 1);
+    } else if (error.response) {
+      console.error("Error response from OpenAI:", error.response.data);
+    } else {
+      console.error("Error in making request:", error.message);
+    }
+    throw error;
+  }
+};
+
+// Usage in your route
+app.post("/api/interview-prep", async (req, res) => {
+  const { jobTitle, jobDescription, interviewDate, resumeText } = req.body;
+
+  try {
+    const prompt = `
+      Based on the following job title and description, generate a list of likely interview questions.
+      
+      Job Title: ${jobTitle}
+      Job Description: ${jobDescription}
+      Resume: ${resumeText}
+      
+      Please provide a list of questions.
+    `;
+
+    const questions = await callOpenAIWithBackoff(prompt);
+
+    // Save to database and respond
+    const newInterview = new Interview({
+      jobTitle,
+      jobDescription,
+      interviewDate,
+      resumeText,
+      questions,
+    });
+
+    await newInterview.save();
+
+    res.status(201).json({
+      message: "Interview prepared successfully!",
+      questions,
+    });
+  } catch (error) {
+    if (error.response && error.response.status === 429) {
+      return res.status(429).json({
+        message: "Rate limit exceeded, please try again after some time.",
+      });
+    }
+    res.status(500).json({
+      message: "An error occurred while generating questions.",
+      error: error.message,
+    });
   }
 });
 

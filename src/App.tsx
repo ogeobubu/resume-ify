@@ -6,6 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import Signup from "./pages/signup.tsx";
 import Signin from "./pages/signin.tsx";
+import Interview from "./pages/interview.tsx";
 
 const App: React.FC = () => {
   return (
@@ -14,6 +15,7 @@ const App: React.FC = () => {
       <Routes>
         <Route path="/" element={<Signup />} />
         <Route path="/signin" element={<Signin />} />
+        <Route path="/interview-prep" element={<Interview />} />
         <Route path="*" element={<p>400</p>} />
       </Routes>
     </div>
