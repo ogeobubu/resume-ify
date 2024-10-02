@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
-import { signin } from "../api";
+import { signin } from "../api.ts";
 import logo from "../assets/logo.png";
 
 interface SignInData {

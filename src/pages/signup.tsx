@@ -2,7 +2,7 @@ import React, { useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { signup } from "../api";
+import { signup } from "../api.ts";
 import logo from "../assets/logo.png";
 
 interface SignUpData {
