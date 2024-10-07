@@ -6,12 +6,13 @@ import dotenv from "dotenv";
 import cors from "cors";
 import bodyParser from "body-parser";
 import mongoose from "mongoose";
-import bcrypt from "bcryptjs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { User } from "./models/User.js";
 import Interview from "./models/Interview.js";
 import axios from "axios";
+import authRoutes from './routes/auth.js';
+import userRoutes from './routes/user.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -29,7 +30,6 @@ app.use(
     credentials: true,
   })
 );
-
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
@@ -37,17 +37,14 @@ app.use(
     saveUninitialized: true,
   })
 );
-
 app.use(passport.initialize());
 app.use(passport.session());
-
 app.get(
   "/api/auth/google",
   passport.authenticate("google", {
     scope: ["profile", "email"],
   })
 );
-
 app.get(
   "/api/auth/google/callback",
   passport.authenticate("google", { failureRedirect: "/" }),
@@ -60,66 +57,20 @@ app.get(
 // MongoDB connection
 const mongoURI = process.env.MONGO_URI;
 mongoose
-  .connect(mongoURI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    serverSelectionTimeoutMS: 20000,
-  })
+  .connect(mongoURI)
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
-// Serve static files from the React app
 app.use(express.static(path.join(__dirname, "../dist")));
 
 // Routes
-app.get("/api", (req, res) => {
-  res.status(200).json({
-    message: "Hello World",
-  });
-});
+app.use("/api", authRoutes)
+app.use("/api/user", userRoutes)
 
 // Sign-up endpoint
-app.post("/api/signup", async (req, res) => {
-  const { fullName, email, password } = req.body;
-  try {
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res
-        .status(400)
-        .json({ message: "User already exists with this email." });
-    }
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ fullName, email, password: hashedPassword });
-    await newUser.save();
-    res.status(201).json({ message: "User signed up successfully!" });
-  } catch (error) {
-    console.error("Sign-up error:", error);
-    res.status(500).json({ message: "Sign-up failed: " + error.message });
-  }
-});
 
-// Sign-in endpoint
-app.post("/api/signin", async (req, res) => {
-  const { email, password } = req.body;
-  try {
-    const userProfile = await User.findOne({ email });
-    if (!userProfile) {
-      return res.status(400).json({ message: "User does not exist!" });
-    }
-    const isPasswordValid = await bcrypt.compare(
-      password,
-      userProfile.password
-    );
-    if (isPasswordValid) {
-      return res.status(200).json({ message: "User logged in successfully!" });
-    } else {
-      return res.status(400).json({ message: "Email/Password is invalid!" });
-    }
-  } catch (error) {
-    console.error("Sign-in error:", error);
-    res.status(500).json({ message: "Server error! Try again later." });
-  }
-});
+
+
 
 // const callOpenAIWithBackoff = async (prompt, retries = 0) => {
 //   try {

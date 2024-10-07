@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { signin } from "../api.ts";
 import logo from "../assets/logo.png";
@@ -7,50 +7,57 @@ import { FiUsers } from "react-icons/fi";
 import { FaLinkedin } from "react-icons/fa";
 import { IoDocumentTextOutline } from "react-icons/io5";
 import { IoIosChatboxes } from "react-icons/io";
-
-interface SignInData {
-  email: string;
-  password: string;
-}
+import { SignInData } from "../types";
 
 const SignUp: React.FC = () => {
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const signInWithGoogle = () => {
     window.location.href = `${import.meta.env.VITE_API_URL}/api/auth/google`;
   };
 
-  const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      setLoading(true);
 
-    const form = e.currentTarget;
-    const email = form.email.value.trim();
-    const password = form.password.value;
+      const form = e.currentTarget;
+      const email = form.email.value.trim();
+      const password = form.password.value;
 
-    if (!email || !password) {
-      toast.error("All fields are required");
-      setLoading(false);
-      return;
-    }
+      if (!email || !password) {
+        toast.error("All fields are required");
+        setLoading(false);
+        return;
+      }
 
-    const data: SignInData = { email, password };
+      const data: SignInData = { email, password };
 
-    try {
-      await signin(data);
-      toast.success("Logged in successfully!");
-    } catch (error) {
-      toast.error("Login failed. Please check your credentials.");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+      try {
+        const response = await signin(data);
+        localStorage.setItem(
+          "resumeToken",
+          JSON.stringify(response.token)
+        );
+        toast.success("Logged in successfully!");
+        navigate("/interview-prep");
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
 
   return (
     <div className="min-h-screen bg-green-100 flex justify-center p-4">
       <div className="max-w-4xl w-full flex justify-center items-center flex-col">
         <div className="card shadow-sm rounded-lg p-2 bg-white w-full mb-6 text-lg">
-          <img className="w-[150px] h-[50px] object-cover" src={logo} alt="logo" />
+          <img
+            className="w-[150px] h-[50px] object-cover"
+            src={logo}
+            alt="logo"
+          />
         </div>
         <div className="flex flex-col md:flex-row justify-between w-full">
           <div className="flex flex-col gap-1">
@@ -58,8 +65,8 @@ const SignUp: React.FC = () => {
               Need some help with your career?
             </p>
             <p className="text-2xl text-green-600 font-semibold">
-              <span className="text-[#000] font-bold">Career AI</span> is{" "}
-              <br /> Your Best Friend
+              <span className="text-[#000] font-bold">Career AI</span> is <br />{" "}
+              Your Best Friend
             </p>
             <div className="mt-6 bg-white rounded-lg shadow-md text-[14px]">
               <h2 className="text-xl font-bold border-b-2 border-gray-200 py-2 mb-4">
@@ -101,11 +108,18 @@ const SignUp: React.FC = () => {
                 Login with Google
               </button>
             </div>
-            <div className="font-bold mt-4 text-gray-600">Or Login with Email</div>
+            <div className="font-bold mt-4 text-gray-600">
+              Or Login with Email
+            </div>
 
             <form className="mt-4 flex flex-col gap-4" onSubmit={handleSubmit}>
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Email
+                </label>
                 <input
                   type="email"
                   name="email"
@@ -117,7 +131,12 @@ const SignUp: React.FC = () => {
                 />
               </div>
               <div className="mt-4">
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Password
+                </label>
                 <input
                   type="password"
                   name="password"
@@ -130,7 +149,9 @@ const SignUp: React.FC = () => {
               </div>
               <button
                 type="submit"
-                className={`mt-6 w-[45%] bg-green-600 text-white py-2 rounded-md hover:bg-green-700 ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+                className={`mt-6 w-[45%] bg-green-600 text-white py-2 rounded-md hover:bg-green-700 ${
+                  loading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
                 disabled={loading}
               >
                 {loading ? "Logging in..." : "Login"}

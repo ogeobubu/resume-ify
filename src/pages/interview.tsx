@@ -94,7 +94,7 @@ const Interview: React.FC = () => {
             alt="logo"
           />
           <button
-            className="bg-green-300 text-white font-bold py-2 px-4 rounded hover:bg-green-200"
+            className="bg-green-500 text-white font-bold py-1 px-6 rounded hover:bg-green-200"
             type="button"
           >
             Logout
@@ -243,7 +243,7 @@ const Interview: React.FC = () => {
                   type="submit"
                   disabled={loading}
                   className={`mt-4 w-full ${
-                    loading ? "bg-gray-400" : "bg-green-400"
+                    loading ? "bg-gray-400" : "bg-green-500"
                   } text-white font-bold py-2 rounded hover:bg-green-200`}
                 >
                   {loading ? "Generating..." : "Generate Prep"}
