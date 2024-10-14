@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { toast } from "react-toastify";
 import { useDropzone } from "react-dropzone";
 import { Link } from "react-router-dom";
@@ -8,7 +8,7 @@ import { FaLinkedin } from "react-icons/fa";
 import { IoDocumentTextOutline } from "react-icons/io5";
 import { IoIosChatboxes } from "react-icons/io";
 import { getDocument, GlobalWorkerOptions } from "pdfjs-dist/build/pdf";
-import { interviewPrep } from "../api.ts";
+import { interviewPrep, getUser } from "../api.ts";
 
 GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.min.js`;
 
@@ -21,6 +21,22 @@ const Interview: React.FC = () => {
   const [interviewDate, setInterviewDate] = useState<string>("");
   const [questions, setQuestions] = useState<string[]>([]);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
+  useEffect(() => {
+    const getProfile = async () => {
+      try {
+        const response = await getUser();
+        localStorage.setItem(
+          "resumeProfile",
+          JSON.stringify(response.user)
+        );
+      } catch (error) {
+        console.error("Failed to fetch user profile:", error);
+      }
+    };
+
+    getProfile();
+  }, []);
 
   const closeModal = () => {
     setIsModalOpen(false);
